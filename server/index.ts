@@ -26,6 +26,7 @@ app.post('/api/runs', async (req, res) => {
   run.total_usage = run.products.reduce((total, product) => ({ input_tokens: total.input_tokens + product.usage.input_tokens, output_tokens: total.output_tokens + product.usage.output_tokens, estimated_cost_usd: total.estimated_cost_usd + product.usage.estimated_cost_usd }), run.total_usage);
   run.status = run.dry_run ? 'complete' : 'review';
 });
+
 app.post('/api/runs/:id/products/:sourceId/decision', (req, res) => {
   const run = runs.get(req.params.id); const product = run?.products.find((item) => item.source_id === req.params.sourceId);
   if (!run || !product) return res.status(404).json({ error: 'Product not found' });
@@ -36,10 +37,13 @@ app.post('/api/runs/:id/products/:sourceId/decision', (req, res) => {
   run.status = run.products.every((item) => ['approved', 'rejected'].includes(item.status)) ? 'complete' : 'review';
   res.json(product);
 });
+
 app.get('/api/runs/:id/export', (req, res) => {
-  const run = runs.get(req.params.id); if (!run) return res.status(404).json({ error: 'Run not found' });
+  const run = runs.get(req.params.id);
+  if (!run) return res.status(404).json({ error: 'Run not found' });
   res.attachment(`approved-products-${run.id}.json`).json(run.products.filter((item) => item.status === 'approved').map((item) => item.output));
 });
 
 const port = Number(process.env.PORT) || 8787;
+
 app.listen(port, () => console.log(`Catalog agent API listening on http://localhost:${port}`));

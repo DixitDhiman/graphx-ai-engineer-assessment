@@ -11,6 +11,7 @@ export type TenantConfig = {
 };
 
 export type Usage = { input_tokens: number; output_tokens: number; estimated_cost_usd: number };
+
 export type ProductResult = {
   source_id: string;
   raw_input: RawProduct;
