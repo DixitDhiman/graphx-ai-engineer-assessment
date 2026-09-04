@@ -1,0 +1,25 @@
+{
+  "shop_name": "QuickPrint Pro",
+  "tagline": "Fast, Affordable, Professional Printing",
+  "location": {
+    "city": "Austin",
+    "state": "TX"
+  },
+  "specialties": [
+    "Fast turnaround signage",
+    "Small business marketing materials",
+    "Custom apparel printing"
+  ],
+  "target_customers": [
+    "Small businesses",
+    "Real estate agents",
+    "Event planners",
+    "Restaurants and retail shops"
+  ],
+  "tone": "Professional but approachable. Not corporate-stiff, not overly casual.",
+  "seo_location_keywords": [
+    "Austin TX",
+    "Austin printing",
+    "print shop Austin"
+  ]
+}

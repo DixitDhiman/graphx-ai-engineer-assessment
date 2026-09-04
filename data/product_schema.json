@@ -1,0 +1,193 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "EnrichedProduct",
+  "description": "A cleaned, enriched product listing ready for a print shop's online catalog.",
+  "type": "object",
+  "required": [
+    "source_id",
+    "name",
+    "slug",
+    "description_short",
+    "description_long",
+    "category",
+    "subcategory",
+    "pricing",
+    "specifications",
+    "turnaround",
+    "seo"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "source_id": {
+      "type": "string",
+      "description": "The original product ID from the CSV."
+    },
+    "name": {
+      "type": "string",
+      "description": "Clean, title-case product name. E.g. 'Premium Business Cards'.",
+      "minLength": 3,
+      "maxLength": 80
+    },
+    "slug": {
+      "type": "string",
+      "description": "URL-safe slug. E.g. 'premium-business-cards'.",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+    },
+    "description_short": {
+      "type": "string",
+      "description": "One sentence, max 160 chars. Used for product cards and meta descriptions.",
+      "maxLength": 160
+    },
+    "description_long": {
+      "type": "string",
+      "description": "2-4 sentences. Highlights key selling points for the end customer.",
+      "minLength": 50,
+      "maxLength": 800
+    },
+    "category": {
+      "type": "string",
+      "description": "Top-level product category.",
+      "enum": [
+        "Business Stationery",
+        "Marketing Materials",
+        "Signage & Displays",
+        "Large Format",
+        "Labels & Stickers",
+        "Apparel & Promotional",
+        "Forms & Documents",
+        "Packaging"
+      ]
+    },
+    "subcategory": {
+      "type": "string",
+      "description": "More specific grouping within the category.",
+      "maxLength": 40
+    },
+    "pricing": {
+      "type": "object",
+      "required": [
+        "display_price",
+        "price_type",
+        "unit_label"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "display_price": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Human-readable price string. Null if POA/call-for-quote."
+        },
+        "price_type": {
+          "type": "string",
+          "enum": [
+            "fixed",
+            "per_unit",
+            "variable",
+            "quote_required"
+          ]
+        },
+        "unit_label": {
+          "type": "string",
+          "description": "What the price is per. E.g. '500 cards', 'sq ft', 'each'."
+        },
+        "minimum_order": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Minimum order quantity or size, if any."
+        }
+      }
+    },
+    "specifications": {
+      "type": "object",
+      "required": [
+        "size",
+        "material"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "size": {
+          "type": "string",
+          "description": "Normalized dimensions. Use inches with 'in' suffix. E.g. '3.5 x 2 in'."
+        },
+        "material": {
+          "type": "string",
+          "description": "Material/stock description, cleaned and expanded from abbreviations."
+        },
+        "finish": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Any finish or coating. E.g. 'Soft Touch Lamination', 'UV Laminated'."
+        },
+        "options": {
+          "type": "array",
+          "description": "Available variants or add-ons mentioned in the source data.",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "turnaround": {
+      "type": "object",
+      "required": [
+        "standard_days"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "standard_days": {
+          "type": "integer",
+          "description": "Standard turnaround in business days (use upper bound if a range).",
+          "minimum": 1,
+          "maximum": 30
+        },
+        "rush_available": {
+          "type": "boolean",
+          "description": "Whether a rush option is implied or stated."
+        }
+      }
+    },
+    "seo": {
+      "type": "object",
+      "required": [
+        "meta_title",
+        "meta_description",
+        "keywords"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "meta_title": {
+          "type": "string",
+          "description": "SEO title tag. Include shop name + product. Max 60 chars.",
+          "maxLength": 60
+        },
+        "meta_description": {
+          "type": "string",
+          "description": "SEO meta description. Max 155 chars.",
+          "maxLength": 155
+        },
+        "keywords": {
+          "type": "array",
+          "description": "3-8 relevant search keywords.",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 3,
+          "maxItems": 8
+        }
+      }
+    },
+    "enrichment_notes": {
+      "type": "array",
+      "description": "Any assumptions or inferences the agent made during enrichment.",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}
