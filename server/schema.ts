@@ -1,7 +1,7 @@
 import Ajv, { ErrorObject } from 'ajv';
 import productSchema from '../data/product_schema.json' with { type: 'json' };
 
-const validator = new Ajv({ allErrors: true, strict: false }).compile(productSchema);
+const validator = new Ajv.default({ allErrors: true, strict: false }).compile(productSchema);
 
 export function validateProduct(value: unknown): { valid: boolean; errors: string[] } {
   const valid = validator(value);

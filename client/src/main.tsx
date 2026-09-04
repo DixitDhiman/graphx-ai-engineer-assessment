@@ -1,23 +1,43 @@
 import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Check, Download, Play, X, WandSparkles } from 'lucide-react';
+// @ts-expect-error The bundler resolves CSS imports at build time.
 import './style.css';
 
-type Product = {
+interface ProductRawInput {
+  [key: string]: string;
+}
+
+interface ProductOutput {
+  [key: string]: unknown;
+}
+
+interface ProductUsage {
+  estimated_cost_usd: number;
+}
+
+interface Product {
   source_id: string;
-  raw_input: Record<string, string>;
+  raw_input: ProductRawInput;
   status: string; attempts: number;
-  output?: Record
-  <string, unknown>;
+  output?: ProductOutput;
   validation_errors?: string[];
-  usage: { estimated_cost_usd: number };
-  last_response?: string
+  usage: ProductUsage;
+  last_response?: string;
 };
-type Run = {
-  id: string; status: string; dry_run: boolean; products: Product[]; total_usage: {
-    estimated_cost_usd:
-    number; input_tokens: number; output_tokens: number
-  }
+
+interface RunUsage {
+  estimated_cost_usd: number;
+  input_tokens: number;
+  output_tokens: number;
+}
+
+interface Run {
+  id: string;
+  status: string;
+  dry_run: boolean;
+  products: Product[];
+  total_usage: RunUsage;
 };
 
 function App() {
@@ -50,8 +70,8 @@ function App() {
     setEditing(false); const next = await fetch(`/api/runs/${run.id}`).then((response) => response.json());
     setRun(next);
   }
-  const products = run?.products.filter((item) => filter === 'all' || item.status === filter) ?? [];
-  const count = (status: string) => run?.products.filter((item) => item.status === status).length ?? 0;
+  const products: Product[] = run?.products.filter((item: Product) => filter === 'all' || item.status === filter) ?? [];
+  const count = (status: string): number => run?.products.filter((item: Product) => item.status === status).length ?? 0;
   return <main>
     <header>
       <div className="brand"><span className="mark">
