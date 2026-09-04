@@ -1,6 +1,6 @@
 # GraphX Catalog Enrichment Workbench
 
-This implementation turns the assessment into a Node.js + React application. The browser is the human review surface; the server owns CSV parsing, tenant-aware OpenAI enrichment, schema validation, retry policy, cost accounting, and run state.
+This implementation is a terminal-only Node.js application. The command line is the human review surface; the pipeline owns CSV parsing, tenant-aware OpenAI enrichment, schema validation, retry policy, cost accounting, and run state.
 
 ## Run it
 
@@ -8,20 +8,19 @@ Requirements: Node.js 20+.
 
 ```bash
 npm install
-npm install --prefix client
 copy .env.example .env
 npm run dev
 ```
 
-Open `http://localhost:5173`. Use **Dry run** to inspect prompts without an API call. Live enrichment requires `OPENAI_API_KEY` in `.env`.
+Answer the terminal questions to choose dry-run mode and concurrency. Use dry-run mode to inspect prompts without an API call. Live enrichment requires `OPENAI_API_KEY` in `.env`.
 
 ## Design
 
 - `parseProducts` reads source rows, `buildPrompt` supplies tenant context and schema, `OpenAIProvider` is the replaceable LLM boundary, and `enrichProduct` validates every response with Ajv.
 - Validation and JSON parse failures are fed into the next prompt. Each product receives at most three enrichment attempts. A 429 gets short exponential backoff inside an attempt.
 - `enrichBatch` limits concurrency and isolates row failures, so one broken product does not stop the other 19.
-- The run object is an explicit decision trace: raw input, prompts/responses, attempts, validation errors, usage, output, and review decision. The current store is in-memory for this small assessment; production would persist it.
-- Approvals export as JSON from `/api/runs/:id/export`. Rejected or failed products never enter the export.
+- The terminal review is an explicit decision trace: raw input, prompts/responses, attempts, validation errors, usage, output, and review decision. The current run is held in memory for this small assessment; production would persist it.
+- Approved products are printed as JSON at the end. Rejected or failed products never enter the output.
 
 OpenAI structured output uses the provided JSON Schema with `strict: true`, then Ajv independently checks the parsed object. The estimated rate uses the `gpt-4o-mini` published input/output rates and is intentionally isolated in `server/provider.ts` so model pricing can be changed in one place.
 
@@ -33,6 +32,14 @@ npm run build
 ```
 
 Tests cover schema rejection of additional fields and the three-attempt retry boundary without calling OpenAI. The next production step would be durable run storage and authenticated multi-user review.
+
+## Terminal workflow
+
+1. Run `npm run dev`.
+2. Choose `y` for dry run or press Enter for live enrichment.
+3. Enter the maximum number of products to process in parallel, or press Enter for `3`.
+4. In live mode, review each product and enter `a` to approve, `e` to edit the JSON, or `r` to reject it.
+5. Copy the approved JSON printed at the end of the run.
 
 GraphX is a multi-tenant print-shop management platform. We are building AI agents that accelerate tenant onboarding. This assessment asks you to build a **Product Catalog Enrichment Agent**.
 
